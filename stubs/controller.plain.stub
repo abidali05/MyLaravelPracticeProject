@@ -1,0 +1,81 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ rootNamespace }}Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class {{ class }} extends Controller
+{
+    private $_request = null;
+    private $_modal = null;
+
+    public function __construct(Request $request, {{ model }} $modal)
+
+    {
+        $this->_request = $request;
+        $this->_modal = $modal;
+    }
+
+    public function index()
+
+    {
+        $all = $this->get_all($this->_modal);
+
+        return view({{ routeName }}, compact('all'));
+    }
+
+    public function create()
+
+    {
+        // return view({{ view_name }});
+    }
+
+    public function store()
+
+    {
+        $this->validate($this->_request, [
+            'name' => 'required',
+        ]);
+
+        $data = $this->_request->except('_token');
+        $var = $this->add($this->_modal, $data);
+
+        return redirect()->route('{{routeName}}');
+    }
+
+    public function show($id)
+
+    {
+        $data = $this->get_by_id($this->_modal, $id);
+        return view('{{view_name}}', compact('data'));
+    }
+
+    public function edit($id)
+
+    {
+        $data = $this->get_by_id($this->_modal, $id);
+        return view('{{view_name}}', compact('data'));
+    }
+
+    public function update($id)
+
+    {
+        $this->validate($this->_request, [
+            'name' => 'required',
+        ]);
+
+        $data = $this->_request->except('_token', '_method');
+
+        $data = $this->get_by_id($this->_modal, $id)->update($data);
+
+        return redirect()->route('{{routeName}}.index');
+    }
+
+    public function destroy($id)
+
+    {
+        $this->delete($this->_modal, $id);
+        return redirect()->route('{{ routeName }}');
+    }
+}
